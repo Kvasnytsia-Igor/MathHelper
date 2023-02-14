@@ -1,10 +1,9 @@
-﻿namespace General;
+﻿namespace MathHelper.Application.Utilities;
 
-public class NumbersHandler
+public class NumberWorker
 {
     private const ulong TEN_QUINTILLION = 10_000_000_000_000_000_000;
-    // parsing a number into one-digit terms
-    public static List<ulong> ParseIntoOneDigitTerms(ulong number)
+    public static List<ulong> DivideIntoTerms(ulong number)
     {
         List<ulong> result = new();
         if (number == 0)

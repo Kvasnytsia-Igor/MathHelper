@@ -1,7 +1,10 @@
-namespace General.Tests.NumbersHandler;
+using MathHelper.Application.Utilities;
 
-public class NumbersHandlerTests
+namespace MathHelper.Application.Tests;
+
+public class NumberServiceTests
 {
+    #region ParseIntoOneDigitTerms
     [Theory]
     [InlineData(25, 2)]
     [InlineData(12304060789, 8)]
@@ -10,7 +13,7 @@ public class NumbersHandlerTests
     public void ParseIntoOneDigitTerms_Number_ResultCount(ulong input, int count)
     {
         // act
-        List<ulong> result = General.NumbersHandler.ParseIntoOneDigitTerms(input);
+        List<ulong> result = NumberWorker.DivideIntoTerms(input);
         // assert
         Assert.Equal(count, result.Count);
     }
@@ -56,11 +59,12 @@ public class NumbersHandlerTests
     public void ParseIntoOneDigitTerms_Number_Collection(ulong input, ulong[] array)
     {
         // act
-        List<ulong> result = General.NumbersHandler.ParseIntoOneDigitTerms(input);
+        List<ulong> result = NumberWorker.DivideIntoTerms(input);
         // assert
         for (int i = 0; i < array.Length; i++)
         {
             Assert.Equal(array[i], result[i]);
         }
     }
+    #endregion
 }
