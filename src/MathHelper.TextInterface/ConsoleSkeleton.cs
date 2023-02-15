@@ -1,12 +1,19 @@
-﻿using MathHelper.TextInterface.Controllers;
+﻿using MathHelper.Application.Models;
+using MathHelper.TextInterface.Controllers;
+using System.Globalization;
 
 namespace MathHelper.TextInterface;
 
 public class ConsoleSkeleton
 {
+    static ConsoleSkeleton()
+    {
+        Console.Title = "MathHelper";
+        CultureInfo.CurrentCulture = new CultureInfo("en-US", false);
+    }
+    private static bool isRunning = true;
     public static void Run()
     {
-        bool isRunning = true;
         while (isRunning)
         {
             string? consoleInput = ReadFromConsole();
@@ -16,14 +23,10 @@ public class ConsoleSkeleton
             }
             try
             {
-                consoleInput = consoleInput.Trim();
-                if (string.Equals(consoleInput, "exit", StringComparison.OrdinalIgnoreCase))
+                var cmd = new ConsoleCommand(consoleInput);
+                string result = Execute(cmd);
+                if (isRunning)
                 {
-                    isRunning = false;
-                }
-                else
-                {
-                    string result = Execute(consoleInput);
                     WriteToConsole(result);
                 }
             }
@@ -34,13 +37,43 @@ public class ConsoleSkeleton
             }
         }
     }
-    private static string Execute(string command)
+    private static string Execute(ConsoleCommand command)
     {
-        if (string.Equals(command, "help", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(command.Name, "exit", StringComparison.OrdinalIgnoreCase))
         {
-            return NumberController.Help();
+            isRunning = false;
         }
-        return NumberController.DivideIntoTerms(command);
+        else if (string.Equals(command.Name, "help", StringComparison.OrdinalIgnoreCase))
+        {
+            return Viewer.CreateMassegesListView(HelpController.GetHelp());
+        }
+        else if (string.Equals(command.Name, "divide-into-terms", StringComparison.OrdinalIgnoreCase))
+        {
+            if (command.Arguments.Count() != 1)
+            {
+                return Viewer.CreateSingleMessageView($"The command input doesn't have one agrument");
+            }
+            List<string> result = NumberController.DivideIntoTerms(command.Arguments.ElementAt(0));
+            if (result.Count == 0)
+            {
+                return Viewer.CreateSingleMessageView($"Incorrect number input");
+            }
+            return Viewer.CreateTermsView(result);
+        }
+        else if (string.Equals(command.Name, "calculate", StringComparison.OrdinalIgnoreCase))
+        {
+            if (command.Arguments.Count() != 1)
+            {
+                return Viewer.CreateSingleMessageView($"The command input doesn't have one agrument");
+            }
+            MathExpression expression = CalculatorController.Calculate(command.Arguments.ElementAt(0));
+            if (!expression.IsSuccess)
+            {
+                return Viewer.CreateSingleMessageView($"Incorrect argument - {command.Arguments.ElementAt(0)}");
+            }
+            return Viewer.CreateExpressionView(expression);
+        }
+        return Viewer.CreateSingleMessageView($"The command {command.Name} doesn't exist");
     }
     private static void WriteToConsole(string message = "")
     {
@@ -53,7 +86,7 @@ public class ConsoleSkeleton
             throw new ArgumentException("Message is empty");
         }
     }
-    private const string _readPrompt = "DivideIntoTerms >> ";
+    private const string _readPrompt = "MathHelper >> ";
     private static string? ReadFromConsole(string promptMessage = "")
     {
         Console.Write(_readPrompt + promptMessage);
