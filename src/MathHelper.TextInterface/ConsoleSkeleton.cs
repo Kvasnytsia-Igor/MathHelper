@@ -1,4 +1,4 @@
-﻿using MathHelper.Application.Models;
+﻿using MathHelper.Application.Utilities;
 using MathHelper.TextInterface.Controllers;
 using System.Globalization;
 
@@ -66,12 +66,12 @@ public class ConsoleSkeleton
             {
                 return Viewer.CreateSingleMessageView($"The command input doesn't have one agrument");
             }
-            MathExpression expression = CalculatorController.Calculate(command.Arguments.ElementAt(0));
-            if (!expression.IsSuccess)
+            string res = Calculator.CalculateExpression(command.Arguments.ElementAt(0));
+            if (string.IsNullOrEmpty(res) == true)
             {
                 return Viewer.CreateSingleMessageView($"Incorrect argument - {command.Arguments.ElementAt(0)}");
             }
-            return Viewer.CreateExpressionView(expression);
+            return Viewer.CreateExpressionView(command.Arguments.ElementAt(0), res);
         }
         return Viewer.CreateSingleMessageView($"The command {command.Name} doesn't exist");
     }

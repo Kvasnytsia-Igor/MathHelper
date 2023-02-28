@@ -2,6 +2,7 @@
 
 public enum ArithmeticOperation
 {
+    None,
     Add,
     Subtract,
     Multiply,

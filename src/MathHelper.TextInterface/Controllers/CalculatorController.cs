@@ -6,12 +6,8 @@ namespace MathHelper.TextInterface.Controllers;
 
 public class CalculatorController
 {
-    public static MathExpression Calculate(string expression)
+    public static TwoNumExpression Calculate(string expression)
     {
-        if (MathExpressionParser.TryParse(expression, out MathExpression mathExpression))
-        {
-            Calculator.CalculateTwoNumbers(mathExpression);
-        }
-        return mathExpression;
+        throw new NotImplementedException();
     }
 }

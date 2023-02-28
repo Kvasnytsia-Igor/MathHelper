@@ -2,11 +2,14 @@
 
 namespace MathHelper.Application;
 
-partial class RagexTemplates
+public partial class RagexTemplates
 {
-    [GeneratedRegex("([0-9]+([.][0-9]*)?|[.][0-9]+)")]
+    [GeneratedRegex(@"([0-9]+)")]
     public static partial Regex NumbersRegex();
 
-    [GeneratedRegex("[.0-9][-+*/][.0-9]")]
+    [GeneratedRegex("[-+*/]")]
     public static partial Regex OperatorRegex();
+
+    [GeneratedRegex(@"([*+/\-)(])|([0-9]+)")]
+    public static partial Regex MathExpressionRages();
 }

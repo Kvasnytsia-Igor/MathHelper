@@ -1,36 +1,142 @@
-﻿using MathHelper.Application.Enums;
-using MathHelper.Application.Models;
+﻿using MathHelper.Application.Models;
+using System.Linq.Expressions;
 
 namespace MathHelper.Application.Utilities;
 
 public class Calculator
 {
-    private const decimal ONE_MILLION = 1_000_000_000;
-    public static MathExpression CalculateTwoNumbers(MathExpression mathExpression)
+    public static string CalculateExpression(string expression)
     {
-        if (Math.Abs(mathExpression.NumberA) > ONE_MILLION || Math.Abs(mathExpression.NumberB) > ONE_MILLION)
-        {
-            string exOut = "";
-            if (Math.Abs(mathExpression.NumberA) > ONE_MILLION)
-            {
-                exOut += $"{mathExpression.NumberA} > {ONE_MILLION} ";
-            }
-            if (Math.Abs(mathExpression.NumberB) > ONE_MILLION)
-            {
-                exOut += $"{mathExpression.NumberB} > {ONE_MILLION} ";
-            }
-            throw new ArgumentException(exOut);
-        }
-        decimal result = mathExpression.ArithmeticOperation switch
-        {
-            ArithmeticOperation.Add => mathExpression.NumberA + mathExpression.NumberB,
-            ArithmeticOperation.Subtract => mathExpression.NumberA - mathExpression.NumberB,
-            ArithmeticOperation.Multiply => mathExpression.NumberA * mathExpression.NumberB,
-            ArithmeticOperation.Divide => mathExpression.NumberA / mathExpression.NumberB,
-            _ => throw new ArithmeticException(),
-        };
-        mathExpression.Result = Math.Round(result, 9);
-        mathExpression.IsSuccess = true;
-        return mathExpression;
+        Calculation calculation = StringToExpression(expression);
+        decimal res = Solve(calculation);
+        return res.ToString();
     }
+    private static Calculation StringToExpression(string exp)
+    {
+        if (!CheckSpaceBetweenBrackets(exp))
+        {
+            exp = exp.Trim('(', ')');
+        }
+        char operatorExp = GetCharOperator(exp, new char[] { '+', '-' }, out int index);
+        if (index == -1)
+        {
+            operatorExp = GetCharOperator(exp, new char[] { '*', '/' }, out index);
+        }
+        if (index != -1)
+        {
+            string leftPart = exp[..index];
+            string rightPart = exp[(index + 1)..];
+            Calculation calculation = new()
+            {
+                LeftHandValue = StringToExpression(leftPart),
+                RightHandValue = StringToExpression(rightPart),
+                Function = CalcFunc(operatorExp),
+                Exp = CalcExp(operatorExp),
+            };
+            return calculation;
+        }
+        return new Calculation
+        {
+            CurrentValue = decimal.Parse(exp)
+        };
+    }
+    private static decimal Solve(Calculation calc)
+    {
+        if (calc.CurrentValue.HasValue)
+        {
+            return calc.CurrentValue.Value;
+        }
+        if(calc.LeftHandValue is null)
+        {
+            throw new NullReferenceException($"Left leaf with num can't be null");
+        }
+        if (!calc.LeftHandValue.CurrentValue.HasValue)
+        {
+            calc.LeftHandValue.CurrentValue = Solve(calc.LeftHandValue);
+        }
+        if (calc.RightHandValue is null)
+        {
+            throw new NullReferenceException($"Right leaf with num can't be null");
+        }
+        if (!calc.RightHandValue.CurrentValue.HasValue)
+        {
+            calc.RightHandValue.CurrentValue = Solve(calc.RightHandValue);
+        }
+        if (calc.Function is null)
+        {
+            throw new NullReferenceException($"Function can't be null");
+        }
+        calc.CurrentValue = calc.Function(calc.LeftHandValue.CurrentValue.Value, calc.RightHandValue.CurrentValue.Value);
+        Console.WriteLine(calc.Exp);
+        return calc.CurrentValue.Value;
+    }
+    
+    private static bool CheckSpaceBetweenBrackets(string exp)
+    {
+        int bracketsСount = 0;
+        for (int i = 0; i < exp.Length; i++)
+        {
+            if (exp[i] == '(')
+            {
+                bracketsСount++;
+            }
+            if (bracketsСount == 0)
+            {
+                return true;
+            }
+            if (exp[i] == ')')
+            {
+                bracketsСount--;
+            }
+        }
+        return false;
+    }
+    private static char GetCharOperator(string exp, char[] operators, out int index)
+    {
+        int bracketsСount = 0;
+        for (int i = exp.Length - 1; i >= 0; i--)
+        {
+            if (exp[i] == ')')
+            {
+                bracketsСount++;
+            }
+            else if (exp[i] == '(')
+            {
+                bracketsСount--;
+            }
+            for (int j = 0; j < operators.Length; j++)
+            {
+                if (exp[i] == operators[j] && bracketsСount == 0)
+                {
+                    index = i;
+                    return operators[j];
+                }
+            }
+        }
+        index = -1;
+        return ' ';
+    }
+    private static Func<decimal, decimal, decimal> CalcFunc(char mathOperator)
+    {
+        return mathOperator switch
+        {
+            '+' => (left, right) => left + right,
+            '-' => (left, right) => left - right,
+            '*' => (left, right) => left * right,
+            '/' => (left, right) => left / right,
+            _ => throw new ArgumentException($"\'{mathOperator}\' - incorrect char"),
+        };
+    }
+    private static Expression<Func<decimal, decimal, decimal>> CalcExp(char mathOperator)
+    {
+        return mathOperator switch
+        {
+            '+' => (left, right) => left + right,
+            '-' => (left, right) => left - right,
+            '*' => (left, right) => left * right,
+            '/' => (left, right) => left / right,
+            _ => throw new ArgumentException($"\'{mathOperator}\' - incorrect char"),
+        };
+    }
+
 }

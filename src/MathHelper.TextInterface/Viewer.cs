@@ -18,10 +18,9 @@ public class Viewer
         sb.AppendLine($"Count: {list.Count}");
         return sb.ToString();
     }
-    public static string CreateExpressionView(MathExpression mathExpression)
+    public static string CreateExpressionView(string exp, string res)
     {
-        char opChar = ConvertOpToChar(mathExpression.ArithmeticOperation);
-        return $"\n{mathExpression.NumberA}{opChar}{mathExpression.NumberB}={mathExpression.Result}\n";
+        return $"\n{exp}={res}\n";
     }
     private static char ConvertOpToChar(ArithmeticOperation arithmeticOperation)
     {
