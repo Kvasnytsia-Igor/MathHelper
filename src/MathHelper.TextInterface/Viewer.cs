@@ -1,50 +1,40 @@
-﻿using MathHelper.Application.Enums;
-using MathHelper.Application.Models;
-using System.Text;
+﻿using System.Text;
 
 namespace MathHelper.TextInterface;
 
 public class Viewer
 {
+    public static string CSVRecordsView(string[] records)
+    {
+        StringBuilder sb = new();
+        string[][] matrix = records.Select(a => a.Split(';')).ToArray();
+        int maxLen = matrix.Select(a => a[0].Length).Max();
+        foreach (string[] splited in matrix)
+        {
+            string modified = splited[0].PadRight(maxLen + 5, ' ') + splited[1];
+            sb.AppendLine(modified);
+        }
+        return sb.ToString();
+    }
     public static string CreateTermsView(List<string> list)
     {
         StringBuilder sb = new();
-        sb.AppendLine($"Result:_________________________________\n");
         foreach (var item in list)
         {
             sb.AppendLine($"{item}");
         }
-        sb.AppendLine($"__________________________________________");
         sb.AppendLine($"Count: {list.Count}");
         return sb.ToString();
     }
     public static string CreateExpressionView(string exp, string res)
     {
-        return $"\n{exp}={res}\n";
-    }
-    private static char ConvertOpToChar(ArithmeticOperation arithmeticOperation)
-    {
-        if (arithmeticOperation == ArithmeticOperation.Add)
-        {
-            return '+';
-        }
-        else if (arithmeticOperation == ArithmeticOperation.Subtract)
-        {
-            return '-';
-        }
-        else if (arithmeticOperation == ArithmeticOperation.Multiply)
-        {
-            return '*';
-        }
-        else
-        {
-            return '/';
-        }
+        StringBuilder sb = new();
+        sb.AppendLine($"{exp}={res}");
+        return sb.ToString();
     }
     public static string CreateMassegesListView(List<string> messages)
     {
         StringBuilder sb = new();
-        sb.AppendLine();
         foreach (var message in messages)
         {
             sb.AppendLine($"{message}");
@@ -53,6 +43,6 @@ public class Viewer
     }
     public static string CreateSingleMessageView(string message)
     {
-        return '\n' + message + '\n';
+        return message + '\n';
     }
 }

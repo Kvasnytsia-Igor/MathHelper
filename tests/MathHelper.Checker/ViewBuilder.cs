@@ -6,7 +6,7 @@ public class ViewBuilder
 {
     public static string ShowArr(byte[] arr)
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         foreach (byte b in arr)
         {
             sb.Append($"{b}");

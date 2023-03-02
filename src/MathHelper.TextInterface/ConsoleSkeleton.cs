@@ -1,5 +1,5 @@
-﻿using MathHelper.Application.Utilities;
-using MathHelper.TextInterface.Controllers;
+﻿using MathHelper.Application.DataAccess;
+using MathHelper.TextInterface.Commands;
 using System.Globalization;
 
 namespace MathHelper.TextInterface;
@@ -45,33 +45,19 @@ public class ConsoleSkeleton
         }
         else if (string.Equals(command.Name, "help", StringComparison.OrdinalIgnoreCase))
         {
-            return Viewer.CreateMassegesListView(HelpController.GetHelp());
+            return Viewer.CreateMassegesListView(HelpInfo._help);
         }
         else if (string.Equals(command.Name, "divide-into-terms", StringComparison.OrdinalIgnoreCase))
         {
-            if (command.Arguments.Count() != 1)
-            {
-                return Viewer.CreateSingleMessageView($"The command input doesn't have one agrument");
-            }
-            List<string> result = NumberController.DivideIntoTerms(command.Arguments.ElementAt(0));
-            if (result.Count == 0)
-            {
-                return Viewer.CreateSingleMessageView($"Incorrect number input");
-            }
-            return Viewer.CreateTermsView(result);
+            return CommandController.DivideIntoTermsCommand(command);
         }
         else if (string.Equals(command.Name, "calculate", StringComparison.OrdinalIgnoreCase))
         {
-            if (command.Arguments.Count() != 1)
-            {
-                return Viewer.CreateSingleMessageView($"The command input doesn't have one agrument");
-            }
-            string res = Calculator.CalculateExpression(command.Arguments.ElementAt(0));
-            if (string.IsNullOrEmpty(res) == true)
-            {
-                return Viewer.CreateSingleMessageView($"Incorrect argument - {command.Arguments.ElementAt(0)}");
-            }
-            return Viewer.CreateExpressionView(command.Arguments.ElementAt(0), res);
+            return CommandController.CalculateCommand(command);
+        }
+        else if (string.Equals(command.Name, "get-calc-history", StringComparison.OrdinalIgnoreCase))
+        {
+            return Viewer.CSVRecordsView(FileCSV.ReadRecords());
         }
         return Viewer.CreateSingleMessageView($"The command {command.Name} doesn't exist");
     }

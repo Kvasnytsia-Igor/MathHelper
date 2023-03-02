@@ -1,26 +1,29 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MathHelper.TextInterface.Models;
+namespace MathHelper.TextInterface.Commands;
 
 public partial class ConsoleCommand
 {
     private readonly List<string> _arguments;
     public ConsoleCommand(string input)
     {
-        string[] stringArray = InputRegex().Split(input);
+        var stringArray = SplitRegex().Split(input);
         _arguments = new List<string>();
-        Name = stringArray[0];
-        if (stringArray.Length > 0)
+        for (int i = 0; i < stringArray.Length; i++)
         {
-            for (int i = 1; i < stringArray.Length; i++)
+            if (i == 0)
             {
-                string inputArgument = stringArray[i];
+                Name = stringArray[i];
+            }
+            else
+            {
+                var inputArgument = stringArray[i];
                 string argument = inputArgument;
-                Regex regex = MyRegex1();
-                Match match = regex.Match(inputArgument);
+                var regex = QuotedTextRegex();
+                var match = regex.Match(inputArgument);
                 if (match.Captures.Count > 0)
                 {
-                    var captureQuotedText = MyRegex2();
+                    var captureQuotedText = UnquotedTextRegex();
                     var quoted = captureQuotedText.Match(match.Captures[0].Value);
                     argument = quoted.Captures[0].Value;
                 }
@@ -38,11 +41,11 @@ public partial class ConsoleCommand
     }
 
     [GeneratedRegex("(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")]
-    private static partial Regex InputRegex();
+    private static partial Regex SplitRegex();
 
     [GeneratedRegex("\"(.*?)\"", RegexOptions.Singleline)]
-    private static partial Regex MyRegex1();
+    private static partial Regex QuotedTextRegex();
 
     [GeneratedRegex("[^\"]*[^\"]")]
-    private static partial Regex MyRegex2();
+    private static partial Regex UnquotedTextRegex();
 }

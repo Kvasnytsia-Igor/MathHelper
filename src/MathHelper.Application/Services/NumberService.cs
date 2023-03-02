@@ -2,9 +2,8 @@
 
 namespace MathHelper.TextInterface.Controllers;
 
-public class NumberController
+public class NumberService
 {
-   
     public static List<string> DivideIntoTerms(string numericString)
     {
         if (ulong.TryParse(numericString, out ulong number))

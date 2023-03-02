@@ -1,5 +1,4 @@
 ﻿using MathHelper.Application.Models;
-using System.Linq.Expressions;
 
 namespace MathHelper.Application.Utilities;
 
@@ -31,7 +30,6 @@ public class Calculator
                 LeftHandValue = StringToExpression(leftPart),
                 RightHandValue = StringToExpression(rightPart),
                 Function = CalcFunc(operatorExp),
-                Exp = CalcExp(operatorExp),
             };
             return calculation;
         }
@@ -46,7 +44,7 @@ public class Calculator
         {
             return calc.CurrentValue.Value;
         }
-        if(calc.LeftHandValue is null)
+        if (calc.LeftHandValue is null)
         {
             throw new NullReferenceException($"Left leaf with num can't be null");
         }
@@ -67,10 +65,8 @@ public class Calculator
             throw new NullReferenceException($"Function can't be null");
         }
         calc.CurrentValue = calc.Function(calc.LeftHandValue.CurrentValue.Value, calc.RightHandValue.CurrentValue.Value);
-        Console.WriteLine(calc.Exp);
         return calc.CurrentValue.Value;
     }
-    
     private static bool CheckSpaceBetweenBrackets(string exp)
     {
         int bracketsСount = 0;
@@ -127,16 +123,4 @@ public class Calculator
             _ => throw new ArgumentException($"\'{mathOperator}\' - incorrect char"),
         };
     }
-    private static Expression<Func<decimal, decimal, decimal>> CalcExp(char mathOperator)
-    {
-        return mathOperator switch
-        {
-            '+' => (left, right) => left + right,
-            '-' => (left, right) => left - right,
-            '*' => (left, right) => left * right,
-            '/' => (left, right) => left / right,
-            _ => throw new ArgumentException($"\'{mathOperator}\' - incorrect char"),
-        };
-    }
-
 }
